@@ -15,7 +15,7 @@ CORS(app)  # Enable CORS
 load_dotenv()
 
 # Retrieve the OpenAI API key from environment variables
-openai_api_key = os.getenv('OPENAI_API_KEY')
+openai_api_key = os.getenv('OPENAI_API_KEY').strip()
 
 # Define the prompt template for the QA chain
 prompt_template = """
@@ -94,7 +94,7 @@ def ask():
             return jsonify(response)
         else:
             # If the question is car-related but not a manual question, use GPT-4 directly
-            gpt4_response = llm(question)
+            gpt4_response = llm.invoke(question)
             return jsonify({'answer': gpt4_response.content if hasattr(gpt4_response, 'content') else str(gpt4_response)})
     else:
         return jsonify({'answer': "Sorry, I don't have much information about it."})
