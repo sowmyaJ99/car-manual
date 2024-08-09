@@ -1,5 +1,6 @@
 import os
-from flask import Flask, request, jsonify
+import base64
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
@@ -7,7 +8,6 @@ from langchain_core.prompts import PromptTemplate
 from langchain_community.vectorstores import FAISS
 from dotenv import load_dotenv
 import whisper
-import tempfile
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS
@@ -18,14 +18,8 @@ load_dotenv()
 # Retrieve the OpenAI API key from environment variables
 openai_api_key = os.getenv('OPENAI_API_KEY')
 
-# Initialize Whisper model lazily
-whisper_model = None
-
-def load_whisper_model():
-    global whisper_model
-    if whisper_model is None:
-        whisper_model = whisper.load_model("small")
-    return whisper_model
+# Initialize Whisper model
+whisper_model = whisper.load_model("base")
 
 # Define the prompt template for the QA chain
 prompt_template = """
@@ -77,6 +71,10 @@ def answer(question):
     result_text = result.content if hasattr(result, 'content') else str(result)
     return result_text, relevant_images
 
+@app.route('/')
+def index():
+    return render_template('index.html')  # Render the index.html template
+
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.json
@@ -102,26 +100,6 @@ def ask():
             return jsonify({'answer': gpt4_response.content if hasattr(gpt4_response, 'content') else str(gpt4_response)})
     else:
         return jsonify({'answer': "Sorry, I don't have much information about it."})
-
-@app.route('/transcribe', methods=['POST'])
-def transcribe():
-    file = request.files.get('audio')
-    if not file:
-        return jsonify({'error': 'No audio file provided'}), 400
-    
-    # Transcribe the audio file using Whisper
-    audio_path = 'temp_audio.wav'
-    file.save(audio_path)
-    
-    # Load the Whisper model only when needed
-    whisper_model = load_whisper_model()
-    
-    # Load the audio file and transcribe
-    result = whisper_model.transcribe(audio_path)
-    os.remove(audio_path)
-    
-    print(f"Transcription: {result['text']}")  # Log the transcription result
-    return jsonify({'transcription': result['text']})
 
 if __name__ == '__main__':
     app.run(debug=True)
