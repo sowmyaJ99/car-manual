@@ -73,10 +73,6 @@ def answer(question):
     result_text = result.content if hasattr(result, 'content') else str(result)
     return result_text, relevant_images
 
-@app.route('/')
-def index():
-    return render_template('index.html')  # Render the index.html template
-
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.json
