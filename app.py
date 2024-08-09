@@ -7,7 +7,6 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain_community.vectorstores import FAISS
 from dotenv import load_dotenv
-import whisper
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS
@@ -17,9 +16,6 @@ load_dotenv()
 
 # Retrieve the OpenAI API key from environment variables
 openai_api_key = os.getenv('OPENAI_API_KEY')
-
-# Initialize Whisper model
-whisper_model = whisper.load_model("base")
 
 # Define the prompt template for the QA chain
 prompt_template = """
@@ -40,7 +36,13 @@ llm = ChatOpenAI(model="gpt-4", openai_api_key=openai_api_key, max_tokens=1024)
 vectorstore = FAISS.load_local("faiss_index", OpenAIEmbeddings(openai_api_key=openai_api_key), allow_dangerous_deserialization=True)
 
 def is_car_related(question):
-    car_keywords = ['car', 'vehicle', 'automobile', 'engine', 'transmission', 'brakes', 'tires', 'maintenance', 'repair', 'oil change', 'fuel', 'dashboard']
+    car_keywords = [
+        'car', 'vehicle', 'automobile', 'engine', 'transmission', 'brakes', 
+        'tires', 'maintenance', 'repair', 'oil change', 'fuel', 'dashboard',
+        'battery', 'headlights', 'suspension', 'alignment', 'service intervals',
+        'airbags', 'navigation', 'audio system', 'steering',
+        'troubleshooting', 'safety', 'fuel economy', 'towing capacity', 'warranty'
+    ]
     return any(keyword in question.lower() for keyword in car_keywords)
 
 def answer(question):
