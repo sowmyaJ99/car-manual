@@ -30,7 +30,7 @@ Answer:
 
 # Initialize the QA chain with the prompt template and OpenAI model
 prompt = PromptTemplate.from_template(prompt_template)
-llm = ChatOpenAI(model="gpt-4", openai_api_key=openai_api_key, max_tokens=1024)
+llm = ChatOpenAI(model="gpt-4o", openai_api_key=openai_api_key, max_tokens=1024)
 
 # Load the FAISS index and metadata using langchain_community.vectorstores.FAISS
 vectorstore = FAISS.load_local("faiss_index", OpenAIEmbeddings(openai_api_key=openai_api_key), allow_dangerous_deserialization=True)
