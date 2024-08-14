@@ -22,13 +22,23 @@ openai_api_key = os.getenv('OPENAI_API_KEY')
 whisper_model = whisper.load_model("small")
 
 # Define the prompt template for the QA chain
+# prompt_template = """
+# You are a car manual expert and highly knowledgeable about vehicle maintenance and operation.
+# Based on the following excerpt from a car manual, diagrams, and tables:
+# {context}
+# Question: {question}
+# If the information is not available or the question is outside the context, respond with "Sorry, I don't have much information about it."
+# Provide a detailed and informative answer based on the context provided.
+# Answer:
+# """
 prompt_template = """
 You are a car manual expert and highly knowledgeable about vehicle maintenance and operation.
 Based on the following excerpt from a car manual, diagrams, and tables:
 {context}
 Question: {question}
-If the information is not available or the question is outside the context, respond with "Sorry, I don't have much information about it."
-Provide a detailed and informative answer based on the context provided.
+If the question is a general greeting or a non-vehicle related statement, respond with "Hello! How can I assist you with vehicle maintenance today?"
+If the information is not available or the question is outside the context of vehicle maintenance, respond with "Sorry, I don't have much information about it."
+Provide a detailed and informative answer based on the context provided if the question is related to vehicle maintenance and operation.
 Answer:
 """
 
